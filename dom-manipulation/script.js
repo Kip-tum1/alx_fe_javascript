@@ -2,10 +2,22 @@ let quoteDisplay = document.getElementById("quoteDisplay")
 // const button = document.querySelector("#newQuote");
 
 let quotes = [
-    "You have power over your mind—not outside events. Realize this, and you will find strength.",
-    "Accept the things to which fate binds you, and love the people with whom fate brings you together, but do so with all your heart.",
-    "If it is not right, do not do it; if it is not true, do not say it.",
-    "“Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth.”"
+    {
+        text: "The only way to do great work is to love what you do.",
+        category: "Inspiration"
+    },
+    {
+        text: "Life is what happens when you're busy making other plans.",
+        category: "Life"
+    },
+    {
+        text: "The future belongs to those who believe in the beauty of their dreams.",
+        category: "Dreams"
+    },
+    {
+        text: "Innovation distinguishes between a leader and a follower.",
+        category: "Innovation"
+    }
     
 ];
 
@@ -13,12 +25,37 @@ let quotes = [
 
 function showRandomQuote(){
     var randomQuote = quotes[Math.floor(Math.random() * quotes.length)];    
-    quoteDisplay.innerHTML = randomQuote;
-    console.log("I am happy")
+    quoteDisplay.innerHTML = [`"${randomQuote.text}" - ${randomQuote.category}`];
+    
+
+
+}
+
+function createAddQuoteForm(){
+    const input = document.createElement("input");
+    const inputCategory = document.createElement("input");
+    const button = document.createElement("button")    
+    input.innerHTML = "text"
+    button.innerHTML = "ADD"
+    quoteDisplay.appendChild(input);
+    quoteDisplay.appendChild(inputCategory);
+    quoteDisplay.appendChild(button)
+
+    button.addEventListener("click", () =>{
+        if (input && inputCategory) {
+        const quoteDisplay = document.getElementById('input-category');
+        quoteDisplay.innerHTML = `"${input.value}"<br><small>- Category: ${inputCategory.value}</small>`;
+        quoteDisplay.style.display = 'block';
+    } else {
+        alert('Please enter both quote text and category!');
+    }
+
+    })
 
 
 }
 showRandomQuote()
+createAddQuoteForm()
 
 function addQuote(){
     
