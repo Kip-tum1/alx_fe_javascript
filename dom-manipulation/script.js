@@ -78,7 +78,12 @@ function addQuote(){
 // Implement JSON Export:
 
 function exportFromJsonFile(){
-    const jsonString = JSON.stringify(quotes, null, 2); 
+    const quote = [
+        { id: 1, text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+        { id: 2, text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+        { id: 3, text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" }
+    ];
+    const jsonString = JSON.stringify(quote, null, 2); 
     const blob = new Blob([jsonString], { type: 'application/json' });
     // Create an URL
 
