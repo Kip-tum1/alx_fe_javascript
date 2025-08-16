@@ -59,7 +59,7 @@ showRandomQuote()
 createAddQuoteForm()
 
 function addQuote(){
-      let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+      let quotes = JSON.parse(localStorage.setItem('quotes') || '[]');
     
     const quoteText = document.getElementById('newQuoteText').value;
     const category = document.getElementById('newQuoteCategory').value;
