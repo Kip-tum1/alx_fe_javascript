@@ -24,6 +24,7 @@ let quotes = [
 
 
 function showRandomQuote(){
+    let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
     var randomQuote = quotes[Math.floor(Math.random() * quotes.length)];    
     quoteDisplay.innerHTML = [`"${randomQuote.text}" - ${randomQuote.category}`];
     
@@ -32,6 +33,7 @@ function showRandomQuote(){
 }
 
 function createAddQuoteForm(){
+      let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
     const input = document.createElement("input");
     const inputCategory = document.createElement("input");
     const button = document.createElement("button")    
@@ -49,7 +51,6 @@ function createAddQuoteForm(){
     } else {
         alert('Please enter both quote text and category!');
     }
-
     })
 
 
@@ -58,6 +59,7 @@ showRandomQuote()
 createAddQuoteForm()
 
 function addQuote(){
+      let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
     
     const quoteText = document.getElementById('newQuoteText').value;
     const category = document.getElementById('newQuoteCategory').value;
@@ -72,3 +74,35 @@ function addQuote(){
 
     
 }
+
+// Implement JSON Export:
+
+function exportFromJsonFile(){
+    const jsonString = JSON.stringify(quotes, null, 2); 
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    // Create an URL
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "quotes.json";
+
+    document.body.append(a);
+
+
+
+}
+
+// Implement JSON Import:
+
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+  }

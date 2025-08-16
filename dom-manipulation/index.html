@@ -20,7 +20,13 @@
         <div id="output"></div>
         <button onclick="addQuote()">Add Quote</button>
     </div>
+
+    <button onclick="exportFromJsonFile()"></button>
+
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
     <script src="script.js"></script>
+
+    
     
 </body>
 </html>
