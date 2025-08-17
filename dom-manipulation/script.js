@@ -136,6 +136,21 @@ function populateCategories(quotes) {
 
 populateCategories(quotes);
 
-function filterQuotes(){
-
+function filterQuotes(selectedCategory) {
+        // Get the quote display element
+    const quoteDisplay = document.getElementById('quoteDisplay');
+            
+    // Filter quotes based on selected category
+    const filteredQuotes = selectedCategory === 'all'? quotes: quotes.filter(quote => quote.category === selectedCategory);
+    // Update the display
+    quoteDisplay.innerHTML = filteredQuotes.length > 0 ? filteredQuotes.map(quote => `<div class="quote">${quote.text}</div>`).join('')
+    : '<div class="quote">No quotes found for this category.</div>';
+            
+    // Save selected category to local storage
+    localStorage.setItem('selectedCategory', selectedCategory); 
+    // Get the quote display element
+    
+    
 }
+
+filterQuotes(selectedCategory);
