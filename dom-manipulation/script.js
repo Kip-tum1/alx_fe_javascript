@@ -33,7 +33,7 @@ function showRandomQuote(){
 }
 
 function createAddQuoteForm(){
-      let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+    // let quote = JSON.parse(localStorage.getItem('quotes') || '[]');
     const input = document.createElement("input");
     const inputCategory = document.createElement("input");
     const button = document.createElement("button")    
@@ -110,4 +110,32 @@ function importFromJsonFile(event) {
       alert('Quotes imported successfully!');
     };
     fileReader.readAsText(event.target.files[0]);
-  }
+}
+
+function populateCategories(quotes) {
+    const categories = [... new Set (quotes.map(quote => quote.category))];
+    const categorys = document.getElementById("categoryFilter");
+    categorys.innerHTML = "";
+
+    const option = document.querySelector("#categoryFilters");
+    categorys.appendChild(option);
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        dropdown.appendChild(option);
+
+    })
+    // let randomCategory = quotes[Math.floor(Math.random() * quotes.length)];
+    // categories.innerHTML = randomCategory.category;
+    // categories.appendChild(randomCategory);
+
+
+}
+
+populateCategories(quotes);
+
+function filterQuotes(){
+
+}
