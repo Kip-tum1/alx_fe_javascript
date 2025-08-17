@@ -154,3 +154,121 @@ function filterQuotes(selectedCategory) {
 }
 
 filterQuotes(selectedCategory);
+
+async function syncQuoteToServer(quote) {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: quote.id, title: quote.text, body: quote.category, timestamp: quote.timestamp })
+        });
+        if (response.ok) {
+            showNotification('Quote synced to server successfully!');
+        } else {
+            showNotification('Failed to sync quote to server.', 'error');
+        }
+    } catch (error) {
+        showNotification('Error syncing with server.', 'error');
+    }
+}
+
+// Fetch quotes from server and sync
+async function syncWithServer() {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+        const serverQuotes = await response.json();
+        const mappedQuotes = serverQuotes.map(q => ({
+            id: q.id,
+            text: q.title,
+            category: q.body,
+            timestamp: q.timestamp || new Date().toISOString()
+        }));
+
+        // Conflict detection and resolution
+        const conflicts = [];
+        const localQuoteIds = new Set(quotes.map(q => q.id));
+        const serverQuoteIds = new Set(mappedQuotes.map(q => q.id));
+
+        // Find conflicts (same ID, different content)
+        for (const serverQuote of mappedQuotes) {
+            const localQuote = quotes.find(q => q.id === serverQuote.id);
+            if (localQuote && (localQuote.text !== serverQuote.text || localQuote.category !== serverQuote.category)) {
+                conflicts.push({ local: localQuote, server: serverQuote });
+            }
+        }
+
+        if (conflicts.length > 0) {
+            showConflictModal(conflicts);
+        } else {
+            // Merge quotes (server precedence)
+            quotes = [
+                ...quotes.filter(q => !serverQuoteIds.has(q.id)), // Keep local quotes not on server
+                ...mappedQuotes // Add server quotes
+            ];
+            saveQuotes();
+            populateCategories();
+            showRandomQuote();
+            localStorage.setItem('lastSyncTime', new Date().toISOString());
+            showNotification('Data synced successfully with server!');
+        }
+    } catch (error) {
+        showNotification('Error fetching data from server.', 'error');
+    }
+}
+
+// Show conflict resolution modal
+function showConflictModal(conflicts) {
+    const modal = document.getElementById('conflictModal');
+    const message = document.getElementById('conflictMessage');
+    message.textContent = `Found ${conflicts.length} conflicting quotes. Choose to keep server or local data, or cancel to resolve later.`;
+    modal.classList.remove('hidden');
+
+    // Event listeners for conflict resolution
+    const useServer = document.getElementById('useServer');
+    const useLocal = document.getElementById('useLocal');
+    const cancel = document.getElementById('cancelConflict');
+
+    const resolve = (strategy) => {
+        if (strategy === 'server') {
+            conflicts.forEach(conflict => {
+                const index = quotes.findIndex(q => q.id === conflict.local.id);
+                quotes[index] = conflict.server;
+            });
+            showNotification('Conflicts resolved using server data.');
+        } else if (strategy === 'local') {
+            // Keep local data, no changes needed
+            showNotification('Conflicts resolved using local data.');
+        }
+        saveQuotes();
+        populateCategories();
+        showRandomQuote();
+        modal.classList.add('hidden');
+    };
+
+    useServer.onclick = () => resolve('server');
+    useLocal.onclick = () => resolve('local');
+    cancel.onclick = () => {
+        modal.classList.add('hidden');
+        showNotification('Conflict resolution cancelled.');
+    };
+}
+
+// Periodic sync (every 30 seconds)
+function startPeriodicSync() {
+    syncWithServer();
+    setInterval(syncWithServer, 30000);
+}
+
+// Initialize the app
+function init() {
+    populateCategories();
+    showRandomQuote();
+    document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+    document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
+    document.getElementById('importFile').addEventListener('change', importFromJsonFile);
+    document.getElementById('manualSync').addEventListener('click', syncWithServer);
+    startPeriodicSync();
+}
+
+// Run initialization
+init();
